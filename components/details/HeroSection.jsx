@@ -20,7 +20,7 @@ const HeroSection = ({ eventInfo }) => {
           <p className="text-[#9C9C9C] text-base mt-1">{eventInfo?.name}</p>
           <div className="text-[#737373] text-sm mt-1">
             <span>{eventInfo?.interested_ids?.length} Interested</span>
-            <span className=" mx-2">|</span>
+            <span className="mx-2">|</span>
             <span>{eventInfo?.going_ids?.length} Going</span>
           </div>
         </div>
