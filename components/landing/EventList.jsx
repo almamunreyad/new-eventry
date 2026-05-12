@@ -1,5 +1,5 @@
 import EventCard from "./EventCard";
-import { getAllEvents } from "@/models/db/queries";
+import { getAllEvents } from "@/db/queries";
 
 const EventList = async () => {
   const allEvents = await getAllEvents();
