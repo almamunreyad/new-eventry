@@ -1,38 +1,38 @@
 "use client";
-// import { performLogin } from "@/app/actions";
-// import useAuth from "@/app/hooks/useAuth";
-// import { useRouter } from "next/navigation";
-// import { useState } from "react";
+import { performLogin } from "@/app/actions";
+import useAuth from "@/app/hooks/useAuth";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 const LoginForm = () => {
-//   const [error, setError] = useState("");
+  const [error, setError] = useState("");
 
-//   const { setAuth } = useAuth();
+  const { setAuth } = useAuth();
 
-//   const router = useRouter();
+  const router = useRouter();
 
-//   async function onSubmit(event) {
-//     event.preventDefault();
+  async function onSubmit(event) {
+    event.preventDefault();
 
-//     try {
-//       const formData = new FormData(event.currentTarget);
+    try {
+      const formData = new FormData(event.currentTarget);
 
-//       const found = await performLogin(formData);
+      const found = await performLogin(formData);
 
-//       if (found) {
-//         setAuth(found);
-//         router.push("/");
-//       } else {
-//         setError(`User with email ${formData.get("email")} not found!`);
-//       }
-//     } catch (err) {
-//       setError(err.message);
-//     }
-//   }
+      if (found) {
+        setAuth(found);
+        router.push("/");
+      } else {
+        setError(`User with email ${formData.get("email")} not found!`);
+      }
+    } catch (err) {
+      setError(err.message);
+    }
+  }
 
   return (
     <>
-      {/* <div className="text-red-800 my-10">{error}</div>
+      <div className="text-red-800 my-10">{error}</div>
 
       <form className="login-form" onSubmit={onSubmit}>
         <div>
@@ -51,8 +51,7 @@ const LoginForm = () => {
         >
           Login
         </button>
-      </form> */}
-      login
+      </form>
     </>
   );
 };
