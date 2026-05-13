@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-
 @theme {
   /* container: center, padding 1rem, maxWidth 1919px (from tailwind.config.js) */
   --container-page-width: 1919px;
@@ -14,6 +13,10 @@
 
   button {
     @apply bg-[#464849] py-2 px-2 rounded-md border border-[#5F5F5F]/50 shadow-sm cursor-pointer hover:bg-[#3C3D3D] transition-colors transition-transform active:translate-y-1;
+  }
+
+  button:disabled {
+    @apply bg-green-600 cursor-not-allowed;
   }
 
   .container {

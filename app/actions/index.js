@@ -1,7 +1,10 @@
 'use server'; // this is a server action
 
-import { createUser, findUserByCredentials } from "@/db/queries";
+import EmailTemplate from "@/components/payments/EmailTemplate";
+import { createUser, findUserByCredentials, getEventById, updateGoing, updateInterest } from "@/db/queries";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { Resend } from "resend";
 
 // actions for register user
 async function registerUser(formData) {
@@ -29,4 +32,69 @@ async function performLogin(formData) {
 }
 
 
-export { registerUser, performLogin };
+// actions for update interest
+async function addInterestedEvent(eventId, authId) {
+    try {
+        await updateInterest(eventId, authId);
+
+    } catch (error) {
+        throw error;
+    }
+
+    revalidatePath('/');
+}
+
+
+// actions for update going
+async function addGoingEvent(eventId, user) {
+    try {
+        if (!user?.id) {
+            throw new Error("You must be signed in to complete registration.");
+        }
+        await updateGoing(eventId, user.id);
+        await sendEmail(eventId, user);
+    } catch (error) {
+        throw error;
+    }
+
+    revalidatePath('/');
+    redirect('/');
+}
+
+
+// actions for resend email verification
+async function sendEmail(eventId, user) {
+
+    try {
+        console.log(eventId, user, process.env.RESEND_API_KEY);
+
+        if (!user?.email) {
+            return;
+        }
+
+        const event = await getEventById(eventId);
+        if (!event?.name) {
+            return;
+        }
+
+        const resend = new Resend(process.env.RESEND_API_KEY);
+
+        const displayName = user.name ?? "Guest";
+        const message = `Dear ${displayName}, You have been successfully registered for the event, ${event.name}. Please carry this email as your ticket for the event.`;
+
+        const sent = await resend.emails.send({
+            from: "Eventry <onboarding@reyad.com>",
+            to: user.email,
+            subject: "Successfully registered for the event",
+            react: EmailTemplate({ message })
+        });
+        console.log(sent);
+        // return sent;
+    } catch (error) {
+        throw error;
+    }
+
+}
+
+
+export { registerUser, performLogin, addInterestedEvent, addGoingEvent, sendEmail };
