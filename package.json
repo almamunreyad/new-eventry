@@ -9,12 +9,15 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@plaiceholder/next": "^3.0.0",
     "@react-email/render": "^2.0.8",
     "mongoose": "^9.6.2",
     "next": "16.2.6",
+    "plaiceholder": "^3.0.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "resend": "^6.12.3"
+    "resend": "^6.12.3",
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
