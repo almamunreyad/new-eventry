@@ -1,8 +1,8 @@
 import PaymentForm from "@/components/payments/PaymentForm"
 
 
-const PaymentPage = ({ params }) => {
-  const { eventId } = params;
+const PaymentPage = async ({ params }) => {
+  const { eventId } = await params;
 
   return (
     <section className="container">

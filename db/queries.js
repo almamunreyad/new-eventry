@@ -5,8 +5,18 @@ import mongoose from "mongoose";
 
 
 // get all events
-async function getAllEvents() {
-    const allEvents = await eventModel.find().lean();
+async function getAllEvents(query) {
+    // const allEvents = await eventModel.find().lean();
+
+
+    let allEvents = [];
+
+    if (query) {
+        const regex = new RegExp(query, "i");
+        allEvents = await eventModel.find({ name: { $regex: regex } }).lean();
+    } else {
+        allEvents = await eventModel.find().lean();
+    }
 
     // return allEvents;
     return replaceMongoIdInArray(allEvents);
@@ -60,12 +70,27 @@ async function updateInterest(eventId, authId) {
 
 
 // update going ids
+// async function updateGoing(eventId, authId) {
+//     const event = await eventModel.findById(eventId);
+//     event.going_ids.push(new mongoose.Types.ObjectId(authId));
+//     event.save();
+// }
+
+// update going ids
 async function updateGoing(eventId, authId) {
     const event = await eventModel.findById(eventId);
 
     if (event) {
-        event.going_ids.push(new mongoose.Types.ObjectId(authId));
-        event.save();
+        if (!event.going_ids) {
+            event.going_ids = [];
+        }
+        const alreadyGoing = event.going_ids.some(
+            (id) => id.toString() === authId.toString()
+        );
+        if (!alreadyGoing) {
+            event.going_ids.push(new mongoose.Types.ObjectId(authId));
+            await event.save();
+        }
     }
 }
 

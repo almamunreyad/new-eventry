@@ -4,6 +4,7 @@ import EmailTemplate from "@/components/payments/EmailTemplate";
 import { createUser, findUserByCredentials, getEventById, updateGoing, updateInterest } from "@/db/queries";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { render } from "@react-email/render";
 import { Resend } from "resend";
 
 // actions for register user
@@ -45,16 +46,29 @@ async function addInterestedEvent(eventId, authId) {
 }
 
 
+
+// actions for update going
+// async function addGoingEvent(eventId, user) {
+//     try {
+//         await updateGoing(eventId, user?.id);
+//     } catch (error) {
+//         throw error;
+//     }
+
+//     revalidatePath('/');
+//     redirect('/');
+// }
+
 // actions for update going
 async function addGoingEvent(eventId, user) {
+    if (!user?.id) {
+        throw new Error("You must be signed in to complete registration.");
+    }
+    await updateGoing(eventId, user.id);
     try {
-        if (!user?.id) {
-            throw new Error("You must be signed in to complete registration.");
-        }
-        await updateGoing(eventId, user.id);
         await sendEmail(eventId, user);
-    } catch (error) {
-        throw error;
+    } catch (emailError) {
+        console.error("Registration email failed:", emailError);
     }
 
     revalidatePath('/');
@@ -77,16 +91,23 @@ async function sendEmail(eventId, user) {
             return;
         }
 
+        if (!process.env.RESEND_API_KEY) {
+            console.warn("RESEND_API_KEY is not set; skipping confirmation email.");
+            return;
+        }
+
         const resend = new Resend(process.env.RESEND_API_KEY);
 
         const displayName = user.name ?? "Guest";
         const message = `Dear ${displayName}, You have been successfully registered for the event, ${event.name}. Please carry this email as your ticket for the event.`;
 
+        const html = await render(EmailTemplate({ message }));
+
         const sent = await resend.emails.send({
             from: "Eventry <onboarding@reyad.com>",
             to: user.email,
             subject: "Successfully registered for the event",
-            react: EmailTemplate({ message })
+            html,
         });
         console.log(sent);
         // return sent;
@@ -95,6 +116,31 @@ async function sendEmail(eventId, user) {
     }
 
 }
+
+
+
+// actions for resend email verification
+// async function sendEmail(eventId, user) {
+
+//     try {
+//         console.log(eventId, user, process.env.RESEND_API_KEY);
+//         const event = await getEventById(eventId);
+//         const resend = new Resend(process.env.RESEND_API_KEY);
+
+//         const message = `Dear ${user.name}, You have been successfully registered for the event, ${event.name}. Please carry this email as your ticket for the event.`;
+
+//         const sent = {
+//             from: "Eventry <onboarding@reyad.com>",
+//             to: user?.email,
+//             subject: "Successfully registered for the event",
+//             react: EmailTemplate({ message })
+//         };
+//     } catch (error) {
+//         throw error;
+//     }
+
+// }
+
 
 
 export { registerUser, performLogin, addInterestedEvent, addGoingEvent, sendEmail };
